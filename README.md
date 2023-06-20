@@ -8,6 +8,9 @@ Fast Matting 是一个通用的抠图框架，集成了SAM 、MODNet等优秀的
 
 # Quick Start
 
+# In the future
+新增基于LoRA的微调segment-anything版本。
+
 # Thanks
 [fast-reid](https://github.com/JDAI-CV/fast-reid) \
 [sam](https://github.com/facebookresearch/segment-anything)
