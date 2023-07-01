@@ -100,7 +100,7 @@ class SAM(nn.Module):
         Normalize and batch the input images
         """
         if isinstance(inputs, dict):
-            images = inputs["image"].to(self.device)
+            images = inputs["images"].to(self.device)
         elif isinstance(inputs, torch.Tensor):
             images = inputs.to(self.device)
         else:
