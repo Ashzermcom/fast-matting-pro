@@ -1,13 +1,12 @@
 import cv2
 import json
+import base64
 import torch
-import imageio
 import argparse
-import numpy as np
 from fastmatting.config import get_cfg
 from fastmatting.core.meta_arch import build_model
 from fastmatting.data.transforms import build_transforms, ResizeLongestSide
-from flask import Flask, Response, request
+from flask import Flask, Response, jsonify
 from fastmatting.web import RequestStatus, log_response_status, preprocess_request
 from gevent import pywsgi
 
@@ -98,7 +97,7 @@ fm_args = argument_parser().parse_args()
 fm_infer = MattingInfer(fm_args)
 
 
-@app.route("/", methods=["POST"])
+@app.route("/api", methods=["POST"])
 def matting():
     req_flag, inputs = preprocess_request()
     if req_flag != RequestStatus.SUC:
@@ -107,9 +106,15 @@ def matting():
     dst_img = pred_matte.detach().cpu().numpy().squeeze()
     dst_img = dst_img > 0
     dst_img = 255 * dst_img
-    encoded_img = cv2.imencode(".png", dst_img)
-    resp = encoded_img[1].tobytes()
-    return Response(response=resp, status=log_response_status(req_flag), mimetype="image/png")
+    encoded_img = cv2.imencode(".png", dst_img)[1]
+    base64_img_str = str(base64.b64encode(encoded_img))[2:-1]
+    # resp = encoded_img[1].tobytes()
+    resp_dict = {
+        "mask": "data:image/png;base64,{}".format(base64_img_str)
+    }
+    # resp = jsonify(resp_dict)
+    resp = json.dumps(resp_dict)
+    return Response(response=resp, status=log_response_status(req_flag), mimetype="application/json")
 
 
 if __name__ == '__main__':
