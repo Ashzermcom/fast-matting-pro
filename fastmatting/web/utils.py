@@ -81,15 +81,7 @@ def preprocess_request():
             "point_label": point_label
         }
     }
-    # if True:
-    #     show_img = inputs["image"]
-    #     show_img = cv2.rectangle(show_img, inputs["prompt"]["box"][:2], inputs["prompt"]["box"][2:], (0,255,0), 2)
-    #     col = inputs["prompt"]["point_set"].shape[0]
-    #     ps = inputs["prompt"]["point_set"]
-    #
-    #     for _ in range(col):
-    #         show_img = cv2.circle(show_img, (int(ps[_][0]), int(ps[_][1])), 2, (255,0,0), 2)
-    #     cv2.imwrite("req.png", show_img)
+
     return RequestStatus.SUC, inputs
 
 

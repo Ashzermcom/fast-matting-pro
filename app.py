@@ -108,11 +108,9 @@ def matting():
     dst_img = 255 * dst_img
     encoded_img = cv2.imencode(".png", dst_img)[1]
     base64_img_str = str(base64.b64encode(encoded_img))[2:-1]
-    # resp = encoded_img[1].tobytes()
     resp_dict = {
         "mask": "data:image/png;base64,{}".format(base64_img_str)
     }
-    # resp = jsonify(resp_dict)
     resp = json.dumps(resp_dict)
     return Response(response=resp, status=log_response_status(req_flag), mimetype="application/json")
 
