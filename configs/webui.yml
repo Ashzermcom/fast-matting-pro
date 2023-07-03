@@ -2,7 +2,7 @@ MODEL:
   DEVICE: "cuda:0"
   META_ARCHITECTURE: "SAM"
   PRETRAIN: True
-  PRETRAIN_PATH: "pretrains/sam_vit_b.pth"
+  PRETRAIN_PATH: "pretrains/sam_vit_b_matting.pth"
   IS_STRICT: False
   PIXEL_MEAN: [123.675, 116.28, 103.53]
   PIXEL_STD: [58.395, 57.12, 57.375]
