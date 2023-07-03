@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鼠标拖动画框</title>
+  <style>
+    .draw-box {
+      width: 400px;
+      height: 400px;
+      background-color: black;
+      margin: 10px auto;
+      position: relative;
+      text-align: center;
+      color: #fff;
+    }
+
+    .react-box {
+      width: 10px;
+      height: 10px;
+      border: 2px dashed red;
+      position: absolute;
+      cursor: pointer;
+      visibility: hidden;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="draw-box" id="drawArear">
+    <!-- 画布区域 -->
+    <div class="react-box" id="drawReact">
+      <!-- 矩形框 -->
+    </div>
+  </div>
+  <div class="demo" style="margin: 0 auto; width: 300px;height: 300px;">
+    <img src="../static/imgs/react.gif" alt="" style="width: 300px;height: 300px;">
+  </div>
+  <script>
+    var drawArear = document.getElementById('drawArear'); // 获取画布元素
+    var drawReact = document.getElementById('drawReact'); // 获取矩形框元素
+    var areaInfo = drawArear.getBoundingClientRect(); // 返回元素的大小及其相对于视口的位置
+    var reactWidth, reactHeight, reactTop, reactLeft; // 定义矩形框的宽、高、top、left
+    var drawFlag = true; // 定义矩形框绘制标识
+    var beginPoint = {}; // 标记起点
+    var endPoint = {}; // 标记终点
+    
+    // 绑定鼠标事件--onmousedown 
+    drawArear.onmousedown = function($event) {
+      drawReact.style.width = '10px'; // 宽
+      drawReact.style.height = '10px'; // 高
+      // if (!drawFlag) {
+      //   return;
+      // }
+      drawFlag = true;
+      drawReact.style.visibility = 'visible'; // 进入画布按下鼠标显示默认矩形框
+      // 鼠标按下的位置作为矩形框的顶点
+      beginPoint = { x: $event.clientX - areaInfo.x, y: $event.clientY - areaInfo.y }
+      reactTop = $event.clientY - areaInfo.y;
+      reactLeft = $event.clientX - areaInfo.x;
+      drawReact.style.top = reactTop + 'px';
+      drawReact.style.left = reactLeft + 'px';
+    }
+
+    // 绑定鼠标事件--onmousemove 
+    drawReact.onmousemove = function($event) {
+      if (!drawFlag) {
+        return;
+      }
+      // 鼠标移动的坐标 - 画布相对视窗的位置 - 矩形相对于画布的偏差（顶点位置） = 矩形框的大小
+      reactWidth = $event.clientX - areaInfo.x + 10; // 宽
+      reactHeight = $event.clientY - areaInfo.y + 10; // 高
+
+      reactWidth = $event.clientX > areaInfo.right ? areaInfo.width + areaInfo.x - beginPoint.x : $event.clientX - areaInfo.x + 10;
+      reactHeight = $event.clientY > areaInfo.bottom ? areaInfo.height + areaInfo.y - beginPoint.y : $event.clientY - areaInfo.y + 10;
+
+      drawReact.style.width = reactWidth - reactLeft + 'px'; // 宽
+      drawReact.style.height = reactHeight - reactTop + 'px'; // 高
+    }
+
+    // 绑定鼠标事件--onmousedown 
+    document.onmouseup = function($event) {
+      drawFlag = false;
+      // 鼠标弹起的点作为矩形框的终点
+      endPoint = { x: $event.clientX - areaInfo.x, y: $event.clientY - areaInfo.y }
+    }
+
+  </script>
+</body>
+
+</html>
