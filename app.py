@@ -1,6 +1,8 @@
 import cv2
 import json
 import base64
+
+import numpy as np
 import torch
 import argparse
 from fastmatting.config import get_cfg
@@ -105,8 +107,11 @@ def matting():
     pred_matte = fm_infer.matte(inputs)
     dst_img = pred_matte.detach().cpu().numpy().squeeze()
     dst_img = dst_img > 0
-    dst_img = 255 * dst_img
-    encoded_img = cv2.imencode(".png", dst_img)[1]
+    dst_img = 255.0 * dst_img
+    src_h, src_w = inputs["image"].shape[:2]
+    dst_img = cv2.resize(dst_img, (src_w, src_h))
+    alpha_img = np.concatenate([inputs["image"], dst_img[:,:,None]], axis=-1)
+    encoded_img = cv2.imencode(".png", alpha_img)[1]
     base64_img_str = str(base64.b64encode(encoded_img))[2:-1]
     resp_dict = {
         "mask": "data:image/png;base64,{}".format(base64_img_str)
