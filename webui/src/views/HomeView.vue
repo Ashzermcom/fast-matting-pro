@@ -94,7 +94,7 @@
                   // transform: 'translate(-50%, -50%)',
 
 
-                }" @mousedown="moveMouse" @click="getOffect">
+                }" @mousedown="moveMouse" @click.stop="getOffect">
                   <div :class="'biaozhu' + index == 'biaozhu' + b_i
                     ? 'biaozhu b_border'
                     : 'biaozhu'
@@ -147,23 +147,16 @@
               </el-form-item>
             </el-form>
           </div>
-
         </div>
-
         <div class="right_box">
           <img class="show_mainBagDER" @load="onImageLoaded($event)" :src="main_imgS" alt="">
+          <img class="back_show" src="@/assets/img/showBafif.png" alt="">
         </div>
       </div>
-
-
-
       <!-- 按钮 -->
       <div class="but_boxDEr">
-
         <el-button type="primary" @click="showBagBox">提交</el-button>
-
       </div>
-
     </div>
 
 
@@ -366,14 +359,13 @@ export default {
       this.isTrue = !this.isTrue;
     },
     getOffect(e) {
-      console.log(e);
-      if (this.subMitObjSer.prompt.box.length >= 4) {
-
-      } else {
+      console.log('第一波添加', e);
+      // if (this.subMitObjSer.prompt.box.length >= 4) {
+      // } else {
+        this.subMitObjSer.prompt.box.splice(2, 2);
         this.subMitObjSer.prompt.box.push(e.offsetX)
         this.subMitObjSer.prompt.box.push(e.offsetY)
-
-      }
+      // }
 
       // console.log('offsetX', e.offsetX, e.offsetY);
 
@@ -409,7 +401,6 @@ export default {
         //算出鼠标相对元素的位置
         let disX = e.clientX - odiv.offsetLeft;
         let disY = e.clientY - odiv.offsetTop;
-        console.log(disX, disY);
         if (this.isTrue) {
           // 拖动
           document.onmousemove = (e) => {
@@ -432,31 +423,41 @@ export default {
           };
         } else {
           // 添加div
-
           console.log(e);
+          // console.log('第二波添加', e);
           this.subMitObjSer.prompt.box.push(e.offsetX)
-
           this.subMitObjSer.prompt.box.push(e.offsetY)
-
           document.onmousemove = (e) => {
             //鼠标按下并移动的事件
             //用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
-
             let left = disX - odiv.getBoundingClientRect().x;
             let top = disY - odiv.getBoundingClientRect().y;
-
-            console.log(e.target.offsetLeft);
-            this.width = (e.clientX - disX) / this.num;
-            this.height = (e.clientY - disY) / this.num;
-            this.biaozhuWidth = this.width;
-            this.biaozhuHeight = this.height;
-            this.biaozhuLeft = left;
-            this.biaozhuTop = top;
+            let show_boxOne = document.querySelector('.show_mainBag')
+            if ((e.clientX - disX) / this.num + Math.trunc(this.biaozhuLeft) + 4 < show_boxOne.width) {
+              this.width = (e.clientX - disX) / this.num;
+              this.biaozhuWidth = this.width;
+              this.biaozhuLeft = left;
+            }
+            if ((e.clientY - disY) / this.num + Math.trunc(this.biaozhuTop) + 4 < show_boxOne.height) {
+              this.height = (e.clientY - disY) / this.num;
+              this.biaozhuHeight = this.height;
+              this.biaozhuTop = top;
+            }
+            // console.log(this.width + Math.trunc(this.biaozhuLeft), this.height + Math.trunc(this.biaozhuTop), show_boxOne.width, show_boxOne.height);
             document.onmouseup = (e) => {
               let left = disX - odiv.getBoundingClientRect().x;
               let top = disY - odiv.getBoundingClientRect().y;
-              this.width = (e.clientX - disX) / this.num;
-              this.height = (e.clientY - disY) / this.num;
+              if ((e.clientX - disX) / this.num + Math.trunc(this.biaozhuLeft) + 4 < show_boxOne.width) {
+                this.width = (e.clientX - disX) / this.num;
+              }
+              if ((e.clientY - disY) / this.num + Math.trunc(this.biaozhuTop) + 4 < show_boxOne.height) {
+                this.height = (e.clientY - disY) / this.num;
+              }
+
+              this.subMitObjSer.prompt.box.push(show_boxOne.width - 2)
+              this.subMitObjSer.prompt.box.push(show_boxOne.height - 2)
+
+
               console.log(e.target.getBoundingClientRect(), disX, disY);
               if (this.width > 5 && this.height > 5) {
                 this.boxArry.push({
@@ -583,13 +584,11 @@ export default {
       let show_boxOne = document.querySelector('.show_mainBag')
       this.subMitObjSer.size.width = show_boxOne.width
       this.subMitObjSer.size.height = show_boxOne.height
-
-      console.log('提交对象', this.subMitObjSer);
+      console.log('提交对象', this.subMitObjSer.prompt);
       getDER(this.subMitObjSer).then(res => {
         console.log(res);
         this.main_imgS = res.mask
-      })
-
+      }) 
     },
 
     handleRemove(file, fileList) {
@@ -769,7 +768,8 @@ export default {
       position: relative;
       justify-content: center;
       align-items: center;
-// border: 1px solid red;
+
+      // border: 1px solid red;
       .left_box {
         width: 12%;
         height: 24vw;
@@ -778,13 +778,14 @@ export default {
         // border: 1px solid black;
         flex-wrap: wrap;
         justify-content: center;
+
         .top_show {
           width: 100%;
           // margin-top: 5vh;
 
           .one_liest_show {
             display: flex;
-            justify-content:center;
+            justify-content: center;
 
             .len_ced {
               width: 40%;
@@ -816,6 +817,7 @@ export default {
           .text_show_two {
             margin-top: 3vh;
             height: 6vh;
+
             // border: 1px solid red;
             .len_shof_but {
               margin-top: 1vh;
@@ -839,6 +841,7 @@ export default {
         border-radius: 4px;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         margin: 0 4vh;
+
         .topImg_show {
           width: 100%;
           height: 20vw;
@@ -910,6 +913,11 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+
+        .show_mainBagDER{
+          position: absolute;
+        }
+
 
       }
     }
@@ -990,11 +998,13 @@ body {}
   border-radius: 50%;
   z-index: 999;
 }
-.isertem .el-form-item__label{
-    color: rgb(0, 0, 0);
-    font-weight: 550;
-    font-size: 14px;
+
+.isertem .el-form-item__label {
+  color: rgb(0, 0, 0);
+  font-weight: 550;
+  font-size: 14px;
 }
+
 .show_boxDmain_showD {
   width: 100%;
   height: 100%;
